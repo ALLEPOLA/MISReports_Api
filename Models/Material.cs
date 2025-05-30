@@ -1,0 +1,14 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+
+namespace MISReports_Api.Models
+{
+    public class Material
+    {
+        public string MatCd { get; set; }
+        public string MatNm { get; set; }
+
+    }
+}
