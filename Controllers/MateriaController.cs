@@ -22,7 +22,8 @@ namespace MISReports_Api.Controllers
             try
             {
                 List<Material> materials = _materialRepository.GetActiveMaterials();
-                return Ok(materials);
+                var response = JObject.Parse(JsonConvert.SerializeObject(new { data = materials }));
+                return Ok(response);
             }
             catch (Exception ex)
             {
