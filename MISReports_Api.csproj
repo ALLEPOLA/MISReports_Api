@@ -194,8 +194,10 @@
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\MateriaController.cs" />
+    <Compile Include="Controllers\TrialBalanceController.cs" />
     <Compile Include="Controllers\ValuesController.cs" />
     <Compile Include="DAL\MaterialRepository.cs" />
+    <Compile Include="DAL\TrialBalanceRepository.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -203,6 +205,7 @@
     <Compile Include="Models\MaterialProvinceStock.cs" />
     <Compile Include="Models\MaterialReagionStock.cs" />
     <Compile Include="Models\MaterialStockBalance.cs" />
+    <Compile Include="Models\TrialBalanceModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

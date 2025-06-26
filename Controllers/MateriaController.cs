@@ -155,7 +155,7 @@ namespace MISReports_Api.Controllers
             }
         }
 
-        // New API: Get province-wise stock by material code
+        //  Get province-wise stock by material code
         [HttpGet]
         [Route("stocks/by-matcd-province-wise/{matCd}")]
         public IHttpActionResult GetMaterialStocksByMatCdProvinceWise([FromUri] string matCd)
@@ -195,5 +195,8 @@ namespace MISReports_Api.Controllers
                 return Ok(JObject.Parse(JsonConvert.SerializeObject(errorResponse)));
             }
         }
+
+        
+        
     }
 }

@@ -205,7 +205,8 @@ namespace MISReports_Api.DAL
 
             return stocks;
         }
-        //provice  vice material quantyty  on  hand
+
+        // Get material stocks by province-wise
         public List<MaterialProvinceStock> GetMaterialStocksByMatCdProvinceWise(string matCd)
         {
             var stocks = new List<MaterialProvinceStock>();
@@ -254,6 +255,6 @@ namespace MISReports_Api.DAL
             return stocks;
         }
 
-
+       
     }
 }
