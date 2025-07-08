@@ -192,15 +192,21 @@
     <Compile Include="Areas\HelpPage\SampleGeneration\SampleDirection.cs" />
     <Compile Include="Areas\HelpPage\SampleGeneration\TextSample.cs" />
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
+    <Compile Include="Controllers\DebtorsBulkController.cs" />
+    <Compile Include="Controllers\DebtorsController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\MateriaController.cs" />
     <Compile Include="Controllers\TrialBalanceController.cs" />
     <Compile Include="Controllers\ValuesController.cs" />
+    <Compile Include="DAL\DebtorsBulkRepository.cs" />
+    <Compile Include="DAL\DebtorsReposatory.cs" />
     <Compile Include="DAL\MaterialRepository.cs" />
     <Compile Include="DAL\TrialBalanceRepository.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\DebtorsBulkModel.cs" />
+    <Compile Include="Models\DebtorsModel.cs" />
     <Compile Include="Models\Material.cs" />
     <Compile Include="Models\MaterialProvinceStock.cs" />
     <Compile Include="Models\MaterialReagionStock.cs" />
@@ -315,7 +321,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>27420</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>https://localhost:44381/</IISUrl>
+          <IISUrl>http://localhost:44381/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>
