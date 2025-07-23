@@ -106,9 +106,9 @@ namespace MISReports_Api.DAL
                         FROM glcompm
                         WHERE status = 2
                           AND (
-                            parent_id LIKE :region
-                            OR Grp_comp LIKE :region
-                            OR comp_id LIKE :region
+                            parent_id LIKE :region||'%'
+                            OR Grp_comp LIKE :region||'%'
+                            OR comp_id LIKE :region||'%'
                           )
                     )
                     ORDER BY dept_id";
