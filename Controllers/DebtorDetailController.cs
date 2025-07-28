@@ -20,6 +20,13 @@ namespace MISReports_Api.Controllers
             [FromUri] string ageRange = "All")
         {
             if (string.IsNullOrWhiteSpace(custType))
+            {
+                return Ok(JObject.FromObject(new
+                {
+                    data = (object)null,
+                    errorMessage = "Customer type parameter is required."
+                }));
+            }
 
             if (string.IsNullOrWhiteSpace(billCycle))
             {
@@ -31,6 +38,13 @@ namespace MISReports_Api.Controllers
             }
 
             if (string.IsNullOrWhiteSpace(areaCode))
+            {
+                return Ok(JObject.FromObject(new
+                {
+                    data = (object)null,
+                    errorMessage = "Area code parameter is required."
+                }));
+            }
 
             try
             {
