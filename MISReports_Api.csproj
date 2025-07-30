@@ -200,6 +200,7 @@
     <Compile Include="Controllers\CompanyTrialBalanceController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\MateriaController.cs" />
+    <Compile Include="Controllers\RegionwiseTrialController.cs" />
     <Compile Include="Controllers\TrialBalanceController.cs" />
     <Compile Include="Controllers\ValuesController.cs" />
     <Compile Include="DAL\AreasRepository.cs" />
@@ -209,6 +210,7 @@
     <Compile Include="DAL\DebtorsReposatory.cs" />
     <Compile Include="DAL\CompanyTrialBalanceRepository.cs" />
     <Compile Include="DAL\MaterialRepository.cs" />
+    <Compile Include="DAL\RegionwiseTrialRepository.cs" />
     <Compile Include="DAL\TrialBalanceRepository.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -223,6 +225,7 @@
     <Compile Include="Models\MaterialProvinceStock.cs" />
     <Compile Include="Models\MaterialReagionStock.cs" />
     <Compile Include="Models\MaterialStockBalance.cs" />
+    <Compile Include="Models\RegionwiseTrialModel.cs" />
     <Compile Include="Models\TrialBalanceModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
