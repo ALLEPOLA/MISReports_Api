@@ -87,7 +87,7 @@ namespace MISReports_Api.DAL
 
                     using (var cmd = new OracleCommand(sql, conn))
                     {
-                        // Add parameters (13 occurrences of COMP_ID)
+                        
                         for (int i = 0; i < 13; i++)
                         {
                             cmd.Parameters.Add(new OracleParameter("COMP_ID", COMP_ID));
