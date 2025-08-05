@@ -9,130 +9,181 @@ namespace MISReports_Api.DAL
 {
     public class RegionwiseTrialRepository
     {
-        private readonly string connectionString = ConfigurationManager.ConnectionStrings["DefaultOracle"].ConnectionString;
+        private readonly string connectionString = ConfigurationManager.ConnectionStrings["HQOracle"].ConnectionString;
 
-        public List<RegionwiseTrialModel> GetRegionwiseTrialData(string COMP_ID, int YR_IND, int MTH_IND)
+        public List<RegionwiseTrialModel> GetRegionwiseTrialData(string companyId, string month, string year)
         {
-            var trialBalanceList = new List<RegionwiseTrialModel>();
+            var results = new List<RegionwiseTrialModel>();
 
-            using (var conn = new OracleConnection(connectionString))
+            try
             {
-                try
+                // Convert and validate parameters
+                int monthInt = int.Parse(month);
+                int yearInt = int.Parse(year);
+                companyId = companyId?.Trim().ToUpper();
+
+                using (var connection = new OracleConnection(connectionString))
                 {
-                    conn.Open();
+                    connection.Open();
+
+                    if (connection.State != ConnectionState.Open)
+                    {
+                        throw new Exception("Failed to open database connection");
+                    }
+
+                    // First get parent company names to avoid subquery in SELECT
+                    var parentCompanies = GetParentCompanyNames(connection, companyId);
 
                     string sql = @"
-                    SELECT 
-                        glledgrm.GL_CD,
-                        glledgrm.AC_CD,
-                        glledgrm.GL_NM,
-                        CASE WHEN SUBSTR(glledgrm.AC_CD,1,1) IN ('A') THEN 'A'  
-                             WHEN SUBSTR(glledgrm.AC_CD,1,1) IN ('E') THEN 'E'
-                             WHEN SUBSTR(glledgrm.AC_CD,1,1) IN ('L') THEN 'L' 
-                             ELSE 'R' END as TitleFlag,
-                        ROUND(SUM(gllegbal.OP_BAL), 2) as OP_BAL,
-                        ROUND(SUM(gllegbal.DR_AMT), 2) as DR_AMT,
-                        ROUND(SUM(gllegbal.CR_AMT), 2) as CR_AMT,
-                        ROUND(SUM(gllegbal.CL_BAL), 2) as CL_BAL,
-                        CASE WHEN gldeptm.COMP_ID = :COMP_ID THEN gldeptm.DEPT_ID  
-                             WHEN glcompm.PARENT_ID = :COMP_ID THEN glcompm.COMP_ID
-                             WHEN glcompm.GRP_COMP = :COMP_ID THEN glcompm.PARENT_ID  
-                             ELSE '' END as COSTCTR,
-                        CASE WHEN gldeptm.COMP_ID = :COMP_ID THEN gldeptm.DEPT_NM  
-                             WHEN glcompm.PARENT_ID = :COMP_ID THEN glcompm.COMP_NM
-                             WHEN glcompm.GRP_COMP = :COMP_ID THEN 
-                                 (SELECT DISTINCT a.COMP_NM FROM glcompm a 
-                                  WHERE a.COMP_ID=glcompm.PARENT_ID AND a.STATUS=2)  
-                             ELSE '' END as Comp_NM,
-                        gldeptm.DEPT_ID
-                    FROM gllegbal, glledgrm, glacgrpm, gltitlm, gldeptm, glcompm
-                    WHERE glledgrm.GL_CD = gllegbal.GL_CD
-                    AND glledgrm.AC_CD = glacgrpm.AC_CD
-                    AND gllegbal.DEPT_ID = gldeptm.DEPT_ID 
-                    AND glcompm.COMP_ID = gldeptm.COMP_ID 
-                    AND glacgrpm.DEPT_ID = '900.00'
-                    AND gldeptm.STATUS = 2 
-                    AND glcompm.STATUS = 2
-                    AND glacgrpm.TITLE_CD = gltitlm.TITLE_CD
-                    AND glledgrm.STATUS = 2
-                    AND gllegbal.DEPT_ID IN (
-                        SELECT DEPT_ID FROM gldeptm 
-                        WHERE STATUS = 2 AND COMP_ID IN (
-                            SELECT COMP_ID FROM glcompm
-                            WHERE COMP_ID = :COMP_ID OR PARENT_ID = :COMP_ID OR GRP_COMP = :COMP_ID
+                    WITH valid_depts AS (
+                        SELECT dept_id FROM gldeptm 
+                        WHERE status = 2 AND comp_id IN (
+                            SELECT comp_id FROM glcompm
+                            WHERE comp_id = :comp_id OR parent_id = :comp_id OR grp_comp = :comp_id
                         )
                     )
-                    AND gllegbal.YR_IND = :YR_IND
-                    AND gllegbal.MTH_IND = :MTH_IND
-                    AND gltitlm.TITLE_CD LIKE 'TB%'
+                    SELECT 
+                        glledgrm.ac_cd as AccountCode,
+                        glledgrm.gl_nm as AccountName,
+                        CASE 
+                            WHEN SUBSTR(glledgrm.ac_cd,1,1) IN ('A') THEN 'A'  
+                            WHEN SUBSTR(glledgrm.ac_cd,1,1) IN ('E') THEN 'E'
+                            WHEN SUBSTR(glledgrm.ac_cd,1,1) IN ('L') THEN 'L' 
+                            ELSE 'R' 
+                        END as TitleFlag,
+                        CASE 
+                            WHEN gldeptm.comp_id = :comp_id THEN gldeptm.dept_id  
+                            WHEN glcompm.parent_id = :comp_id THEN glcompm.comp_id
+                            WHEN glcompm.grp_comp = :comp_id THEN glcompm.parent_id  
+                            ELSE '' 
+                        END as CostCenter,
+                        CASE 
+                            WHEN gldeptm.comp_id = :comp_id THEN gldeptm.dept_nm  
+                            WHEN glcompm.parent_id = :comp_id THEN glcompm.comp_nm
+                            WHEN glcompm.grp_comp = :comp_id THEN :parent_company_name  
+                            ELSE '' 
+                        END as CompanyName,
+                        gldeptm.dept_id as DepartmentId,
+                        ROUND(SUM(gllegbal.op_bal),2) AS OpeningBalance,
+                        ROUND(SUM(gllegbal.dr_amt),2) AS DebitAmount,
+                        ROUND(SUM(gllegbal.cr_amt),2) AS CreditAmount,
+                        ROUND(SUM(gllegbal.cl_bal),2) AS ClosingBalance
+                    FROM 
+                        gllegbal, 
+                        glledgrm, 
+                        glacgrpm, 
+                        gltitlm, 
+                        gldeptm,
+                        glcompm
+                    WHERE 
+                        glledgrm.gl_cd = gllegbal.gl_cd
+                        AND glledgrm.ac_cd = glacgrpm.ac_cd
+                        AND gllegbal.dept_id = gldeptm.dept_id 
+                        AND glcompm.comp_id = gldeptm.comp_id 
+                        AND glacgrpm.dept_id = '900.00'
+                        AND gldeptm.status = 2 
+                        AND glcompm.status = 2
+                        AND glacgrpm.title_cd = gltitlm.title_cd
+                        AND glledgrm.status = 2
+                        AND gllegbal.dept_id IN (SELECT dept_id FROM valid_depts)
+                        AND gllegbal.yr_ind = :year
+                        AND gllegbal.mth_ind = :month
+                        AND gltitlm.title_cd LIKE 'TB%'
                     GROUP BY 
-                        CASE WHEN gldeptm.COMP_ID = :COMP_ID THEN gldeptm.DEPT_ID  
-                             WHEN glcompm.PARENT_ID = :COMP_ID THEN glcompm.COMP_ID
-                             WHEN glcompm.GRP_COMP = :COMP_ID THEN glcompm.PARENT_ID  
-                             ELSE '' END,
-                        glcompm.GRP_COMP,
-                        glcompm.PARENT_ID,
-                        glcompm.COMP_ID,
-                        gldeptm.COMP_ID,
-                        gldeptm.DEPT_ID,
-                        glledgrm.AC_CD,
-                        glledgrm.GL_NM,
-                        gldeptm.DEPT_NM,
-                        glcompm.COMP_NM
-                    ORDER BY 
-                        CASE WHEN gldeptm.COMP_ID = :COMP_ID THEN gldeptm.DEPT_ID  
-                             WHEN glcompm.PARENT_ID = :COMP_ID THEN glcompm.COMP_ID
-                             WHEN glcompm.GRP_COMP = :COMP_ID THEN glcompm.PARENT_ID  
-                             ELSE '' END";
+                        glledgrm.ac_cd, 
+                        glledgrm.gl_nm,
+                        CASE 
+                            WHEN gldeptm.comp_id = :comp_id THEN gldeptm.dept_id  
+                            WHEN glcompm.parent_id = :comp_id THEN glcompm.comp_id
+                            WHEN glcompm.grp_comp = :comp_id THEN glcompm.parent_id  
+                            ELSE '' 
+                        END,
+                        CASE 
+                            WHEN gldeptm.comp_id = :comp_id THEN gldeptm.dept_nm  
+                            WHEN glcompm.parent_id = :comp_id THEN glcompm.comp_nm
+                            WHEN glcompm.grp_comp = :comp_id THEN :parent_company_name  
+                            ELSE '' 
+                        END,
+                        gldeptm.dept_id
+                    ORDER BY CostCenter";
 
-                    using (var cmd = new OracleCommand(sql, conn))
+                    using (var command = new OracleCommand(sql, connection))
                     {
-                        // Add parameters (13 occurrences of COMP_ID)
-                        for (int i = 0; i < 13; i++)
-                        {
-                            cmd.Parameters.Add(new OracleParameter("COMP_ID", COMP_ID));
-                        }
+                        command.BindByName = true;
 
-                        cmd.Parameters.Add(new OracleParameter("YR_IND", YR_IND));
-                        cmd.Parameters.Add(new OracleParameter("MTH_IND", MTH_IND));
+                        // Add parameters with correct OracleDbTypes
+                        command.Parameters.Add("comp_id", OracleDbType.Char).Value = companyId;
+                        command.Parameters.Add("month", OracleDbType.Int32).Value = monthInt;
+                        command.Parameters.Add("year", OracleDbType.Int32).Value = yearInt;
+                        command.Parameters.Add("parent_company_name", OracleDbType.Varchar2).Value =
+                            parentCompanies.ContainsKey(companyId) ? parentCompanies[companyId] : "";
 
-                        using (var reader = cmd.ExecuteReader())
+                        using (var reader = command.ExecuteReader())
                         {
                             while (reader.Read())
                             {
-                                var item = new RegionwiseTrialModel
+                                results.Add(new RegionwiseTrialModel
                                 {
-                                    GL_CD = reader["GL_CD"]?.ToString(),
-                                    AC_CD = reader["AC_CD"]?.ToString(),
-                                    GL_NM = reader["GL_NM"]?.ToString(),
-                                    TitleFlag = reader["TitleFlag"]?.ToString(),
-                                    OP_BAL = reader["OP_BAL"] != DBNull.Value ? Convert.ToDecimal(reader["OP_BAL"]) : 0,
-                                    DR_AMT = reader["DR_AMT"] != DBNull.Value ? Convert.ToDecimal(reader["DR_AMT"]) : 0,
-                                    CR_AMT = reader["CR_AMT"] != DBNull.Value ? Convert.ToDecimal(reader["CR_AMT"]) : 0,
-                                    CL_BAL = reader["CL_BAL"] != DBNull.Value ? Convert.ToDecimal(reader["CL_BAL"]) : 0,
-                                    COSTCTR = reader["COSTCTR"]?.ToString(),
-                                    Comp_NM = reader["Comp_NM"]?.ToString(),
-                                    DEPT_ID = reader["DEPT_ID"]?.ToString()
-                                };
-
-                                trialBalanceList.Add(item);
+                                    AccountCode = reader["AccountCode"].ToString(),
+                                    AccountName = reader["AccountName"].ToString(),
+                                    TitleFlag = reader["TitleFlag"].ToString(),
+                                    CostCenter = reader["CostCenter"].ToString(),
+                                    CompanyName = reader["CompanyName"].ToString(),
+                                    DepartmentId = reader["DepartmentId"].ToString(),
+                                    OpeningBalance = SafeGetDecimal(reader["OpeningBalance"]),
+                                    DebitAmount = SafeGetDecimal(reader["DebitAmount"]),
+                                    CreditAmount = SafeGetDecimal(reader["CreditAmount"]),
+                                    ClosingBalance = SafeGetDecimal(reader["ClosingBalance"])
+                                });
                             }
                         }
                     }
                 }
-                catch (OracleException ex)
+                return results;
+            }
+            catch (OracleException ex)
+            {
+                throw new Exception($"Oracle Error {ex.Number}: {ex.Message}", ex);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Database operation failed: {ex.Message}", ex);
+            }
+        }
+
+        private Dictionary<string, string> GetParentCompanyNames(OracleConnection connection, string companyId)
+        {
+            var result = new Dictionary<string, string>();
+
+            string sql = @"
+                SELECT DISTINCT a.comp_id, a.comp_nm 
+                FROM glcompm a 
+                WHERE a.comp_id IN (
+                    SELECT parent_id FROM glcompm 
+                    WHERE grp_comp = :comp_id AND status = 2
+                )";
+
+            using (var command = new OracleCommand(sql, connection))
+            {
+                command.Parameters.Add("comp_id", OracleDbType.Char).Value = companyId;
+
+                using (var reader = command.ExecuteReader())
                 {
-                    System.Diagnostics.Trace.TraceError($"Oracle Error {ex.Number}: {ex.Message}");
-                    throw;
-                }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Trace.TraceError($"Error: {ex.Message}");
-                    throw;
+                    while (reader.Read())
+                    {
+                        result[reader["comp_id"].ToString()] = reader["comp_nm"].ToString();
+                    }
                 }
             }
 
-            return trialBalanceList;
+            return result;
+        }
+
+        private decimal SafeGetDecimal(object value)
+        {
+            if (value == null || value == DBNull.Value)
+                return 0m;
+            return Convert.ToDecimal(value);
         }
     }
 }

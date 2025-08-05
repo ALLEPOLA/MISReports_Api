@@ -1,6 +1,5 @@
 ﻿using MISReports_Api.DAL;
 using MISReports_Api.Models;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Web.Http;
@@ -13,63 +12,52 @@ namespace MISReports_Api.Controllers
         private readonly RegionwiseTrialRepository _repository = new RegionwiseTrialRepository();
 
         [HttpGet]
-        [Route("balance")]
-        public IHttpActionResult GetRegionwiseTrialBalance([FromUri] string COMP_ID, [FromUri] int YR_IND, [FromUri] int MTH_IND)
+        [Route("")]
+        public IHttpActionResult GetRegionwiseTrial([FromUri] string companyId, [FromUri] string month, [FromUri] string year)
         {
-            if (string.IsNullOrWhiteSpace(COMP_ID))
-            {
-                return Ok(JObject.FromObject(new
-                {
-                    data = (object)null,
-                    errorMessage = "COMP_ID parameter is required."
-                }));
-            }
-
-            if (YR_IND <= 0)
-            {
-                return Ok(JObject.FromObject(new
-                {
-                    data = (object)null,
-                    errorMessage = "Valid YR_IND parameter is required."
-                }));
-            }
-
-            if (MTH_IND <= 0 || MTH_IND > 12)
-            {
-                return Ok(JObject.FromObject(new
-                {
-                    data = (object)null,
-                    errorMessage = "Valid MTH_IND parameter (1-12) is required."
-                }));
-            }
-
             try
             {
-                var trialData = _repository.GetRegionwiseTrialData(COMP_ID, YR_IND, MTH_IND);
-
-                return Ok(JObject.FromObject(new
+                // Input validation
+                if (string.IsNullOrWhiteSpace(companyId))
                 {
-                    data = trialData,
-                    errorMessage = (string)null
-                }));
+                    return BadRequest("Company ID is required");
+                }
+
+                if (string.IsNullOrWhiteSpace(month))
+                {
+                    return BadRequest("Month is required");
+                }
+
+                if (string.IsNullOrWhiteSpace(year))
+                {
+                    return BadRequest("Year is required");
+                }
+
+                // Log input parameters
+                System.Diagnostics.Trace.WriteLine($"Request received: companyId={companyId}, month={month}, year={year}");
+
+                var data = _repository.GetRegionwiseTrialData(companyId, month, year);
+
+                return Ok(new
+                {
+                    success = true,
+                    count = data.Count,
+                    data = data
+                });
             }
             catch (Exception ex)
             {
-                // Log the error details for debugging
-                System.Diagnostics.Trace.TraceError($"Error in GetRegionwiseTrialBalance: {ex}");
+                // Log error details
+                System.Diagnostics.Trace.WriteLine($"ERROR: {ex.ToString()}");
 
-                return Ok(JObject.FromObject(new
+                return Ok(new
                 {
-                    data = (object)null,
-                    errorMessage = "Cannot get regionwise trial balance data.",
-                    errorDetails = ex.Message
-                }));
+                    success = false,
+                    message = "Error retrieving regionwise trial balance data",
+                    detailedError = ex.Message,
+                    innerError = ex.InnerException?.Message
+                });
             }
         }
-
-
-
-
-
     }
 }
