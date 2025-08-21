@@ -1,57 +1,74 @@
-﻿using System;
+﻿// Models/OUMModels.cs
+using System;
 using System.Collections.Generic;
 
 namespace MISReports_Api.Models
 {
-
-    //Represents data from the Excel file:
-    public class Employee
+    public class OUMEmployeeModel
     {
-        public DateTime auth_date { get; set; }
-        public int order_id { get; set; }
-        public string acct_number { get; set; }
-        public string bank_code { get; set; }
-        public decimal bill_amt { get; set; }
-        public decimal tax_amt { get; set; }
-        public decimal tot_amt { get; set; }
-        public string auth_code { get; set; }
-        public string card_no { get; set; }
-    }
-    //Represents temporary credit transaction records in the database with additional fields 
-    public class CrdTemp
-    {
-        public int order_id { get; set; }
-        public string acct_number { get; set; }
-        public string custname { get; set; }
-        public string username { get; set; }
-        public decimal bill_amt { get; set; }
-        public decimal tax_amt { get; set; }
-        public decimal tot_amt { get; set; }
-        public string trstatus { get; set; }
-        public string authcode { get; set; }
-        public DateTime pmnt_date { get; set; }
-        public DateTime auth_date { get; set; }
-        public string cebres { get; set; }
-        public int serl_no { get; set; }
-        public string bank_code { get; set; }
-        public string bran_code { get; set; }
-        public string inst_status { get; set; }
-        public string updt_status { get; set; }
-        public string updt_flag { get; set; }
-        public string post_flag { get; set; }
-        public string err_flag { get; set; }
-        public DateTime post_date { get; set; }
-        public string card_no { get; set; }
-        public string payment_type { get; set; }
-        public string ref_number { get; set; }
-        public string reference_type { get; set; }
-        public string sms_st { get; set; }
-    }
-    //Standard API response format 
-    public class OUMResponse
-    {
-        public object Data { get; set; }
+        public DateTime AuthDate { get; set; }
+        public int OrderId { get; set; }
+        public string AcctNumber { get; set; }
+        public string BankCode { get; set; }
+        public decimal BillAmt { get; set; }
+        public decimal TaxAmt { get; set; }
+        public decimal TotAmt { get; set; }
+        public string AuthCode { get; set; }
+        public string CardNo { get; set; }
         public string ErrorMessage { get; set; }
-        public string ErrorDetails { get; set; }
+    }
+
+    public class OUMCrdTempModel
+    {
+        public int OrderId { get; set; }
+        public string AcctNumber { get; set; }
+        public string CustName { get; set; }
+        public string UserName { get; set; }
+        public decimal BillAmt { get; set; }
+        public decimal TaxAmt { get; set; }
+        public decimal TotAmt { get; set; }
+        public string TrStatus { get; set; }
+        public string AuthCode { get; set; }
+        public DateTime PmntDate { get; set; }
+        public DateTime AuthDate { get; set; }
+        public string CebRes { get; set; }
+        public int SerlNo { get; set; }
+        public string BankCode { get; set; }
+        public string BranCode { get; set; }
+        public string InstStatus { get; set; }
+        public string UpdtStatus { get; set; }
+        public string UpdtFlag { get; set; }
+        public string PostFlag { get; set; }
+        public string ErrFlag { get; set; }
+        public DateTime? PostDate { get; set; }
+        public string CardNo { get; set; }
+        public string PaymentType { get; set; }
+        public string RefNumber { get; set; }
+        public string ReferenceType { get; set; }
+        public string SmsSt { get; set; }
+        public string ErrorMessage { get; set; }
+    }
+
+    public class OUMUploadResponseModel
+    {
+        public int RecordsInserted { get; set; }
+        public string Message { get; set; }
+        public string ErrorMessage { get; set; }
+        public List<OUMCrdTempModel> Data { get; set; }
+    }
+
+    public class OUMApproveResponseModel
+    {
+        public bool Success { get; set; }
+        public string Message { get; set; }
+        public string ErrorMessage { get; set; }
+        public int RecordsProcessed { get; set; }
+    }
+
+    public class OUMRecordsResponseModel
+    {
+        public List<OUMCrdTempModel> Records { get; set; }
+        public int TotalRecords { get; set; }
+        public string ErrorMessage { get; set; }
     }
 }
