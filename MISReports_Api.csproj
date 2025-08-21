@@ -34,6 +34,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -45,10 +46,22 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EPPlus, Version=8.0.6.0, Culture=neutral, PublicKeyToken=ea159fdaa78159a1, processorArchitecture=MSIL">
+      <HintPath>packages\EPPlus.8.0.6\lib\net462\EPPlus.dll</HintPath>
+    </Reference>
+    <Reference Include="EPPlus.Interfaces, Version=8.1.0.0, Culture=neutral, PublicKeyToken=a694d7f3b0907a61, processorArchitecture=MSIL">
+      <HintPath>packages\EPPlus.Interfaces.8.1.0\lib\net462\EPPlus.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="IBM.Data.Informix, Version=3.0.0.2, Culture=neutral, PublicKeyToken=7c307b91aa13d208, processorArchitecture=AMD64">
+      <HintPath>packages\IBM.Data.Informix.AvatarSolucoes.3.0.8001.2\lib\net452\IBM.Data.Informix.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=8.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>packages\Microsoft.Bcl.AsyncInterfaces.8.0.0\lib\net462\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.IO.RecyclableMemoryStream, Version=3.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.IO.RecyclableMemoryStream.3.0.1\lib\netstandard2.0\Microsoft.IO.RecyclableMemoryStream.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -58,9 +71,13 @@
     <Reference Include="Oracle.ManagedDataAccess, Version=4.122.23.1, Culture=neutral, PublicKeyToken=89b483f429c47342, processorArchitecture=MSIL">
       <HintPath>packages\Oracle.ManagedDataAccess.23.8.0\lib\net472\Oracle.ManagedDataAccess.dll</HintPath>
     </Reference>
+    <Reference Include="PresentationCore" />
     <Reference Include="System" />
     <Reference Include="System.Buffers, Version=4.0.4.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>packages\System.Buffers.4.6.0\lib\net462\System.Buffers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ComponentModel.Annotations, Version=4.2.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\System.ComponentModel.Annotations.5.0.0\lib\net461\System.ComponentModel.Annotations.dll</HintPath>
     </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Diagnostics.DiagnosticSource, Version=6.0.0.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
@@ -82,6 +99,10 @@
     </Reference>
     <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>packages\System.Runtime.CompilerServices.Unsafe.6.1.0\lib\net462\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security" />
+    <Reference Include="System.Security.Cryptography.Xml, Version=8.0.0.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.Security.Cryptography.Xml.8.0.2\lib\net462\System.Security.Cryptography.Xml.dll</HintPath>
     </Reference>
     <Reference Include="System.Text.Encodings.Web, Version=8.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>packages\System.Text.Encodings.Web.8.0.0\lib\net462\System.Text.Encodings.Web.dll</HintPath>
@@ -192,53 +213,61 @@
     <Compile Include="Areas\HelpPage\SampleGeneration\SampleDirection.cs" />
     <Compile Include="Areas\HelpPage\SampleGeneration\TextSample.cs" />
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
-    <Compile Include="Controllers\AreasController.cs" />
-    <Compile Include="Controllers\BillCycleController.cs" />
-    <Compile Include="Controllers\DebtorDetailController.cs" />
-    <Compile Include="Controllers\DebtorsBulkController.cs" />
-    <Compile Include="Controllers\DebtorsController.cs" />
-    <Compile Include="Controllers\CompanyTrialBalanceController.cs" />
+    <Compile Include="Controllers\Debtors\AreasController.cs" />
+    <Compile Include="Controllers\Debtors\BillCycleController.cs" />
+    <Compile Include="Controllers\Debtors\DebtorDetailController.cs" />
+    <Compile Include="Controllers\Debtors\DebtorsBulkController.cs" />
+    <Compile Include="Controllers\Debtors\DebtorsController.cs" />
+    <Compile Include="Controllers\OUMController.cs" />
+    <Compile Include="Controllers\TrialBalance\CompanyTrialBalanceController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="Controllers\IncomeExpenditureController.cs" />
-    <Compile Include="Controllers\IncomeExpenditureRegionController.cs" />
-    <Compile Include="Controllers\InventoryAverageConsumptionController.cs" />
-    <Compile Include="Controllers\MateriaController.cs" />
-    <Compile Include="Controllers\RegionwiseTrialController.cs" />
-    <Compile Include="Controllers\provinceIncomeExpenditureController.cs" />
-    <Compile Include="Controllers\TrialBalanceController.cs" />
-    <Compile Include="Controllers\ValuesController.cs" />
-    <Compile Include="DAL\AreasRepository.cs" />
-    <Compile Include="DAL\BillCycleRepository.cs" />
-    <Compile Include="DAL\DebtorDetailRepository.cs" />
-    <Compile Include="DAL\DebtorsBulkRepository.cs" />
-    <Compile Include="DAL\DebtorsReposatory.cs" />
-    <Compile Include="DAL\CompanyTrialBalanceRepository.cs" />
-    <Compile Include="DAL\IncomeExpenditureRegionRepository.cs" />
-    <Compile Include="DAL\IncomeExpenditureRepository.cs" />
-    <Compile Include="DAL\InventoryAverageConsumptionRepository.cs" />
-    <Compile Include="DAL\MaterialRepository.cs" />
-    <Compile Include="DAL\ProvinceIncomeExpenditureRepository.cs" />
-    <Compile Include="DAL\RegionwiseTrialRepository.cs" />
-    <Compile Include="DAL\TrialBalanceRepository.cs" />
+    <Compile Include="Controllers\IncomeExpenditure\IncomeExpenditureController.cs" />
+    <Compile Include="Controllers\IncomeExpenditure\IncomeExpenditureRegionController.cs" />
+    <Compile Include="Controllers\Inventory\InventoryAverageConsumptionController.cs" />
+    <Compile Include="Controllers\Inventory\MateriaController.cs" />
+    <Compile Include="Controllers\TrialBalance\RegionwiseTrialController.cs" />
+    <Compile Include="Controllers\IncomeExpenditure\provinceIncomeExpenditureController.cs" />
+    <Compile Include="Controllers\TrialBalance\TrialBalanceController.cs" />
+    <Compile Include="Controllers\UserRoleController.cs" />
+    <Compile Include="Controllers\Inventory\WarehouseController.cs" />
+    <Compile Include="DAL\Debtors\AreasRepository.cs" />
+    <Compile Include="DAL\Debtors\BillCycleRepository.cs" />
+    <Compile Include="DAL\Debtors\DebtorDetailRepository.cs" />
+    <Compile Include="DAL\Debtors\DebtorsBulkRepository.cs" />
+    <Compile Include="DAL\Debtors\DebtorsReposatory.cs" />
+    <Compile Include="DAL\OUMRepository.cs" />
+    <Compile Include="DAL\TrialBalance\CompanyTrialBalanceRepository.cs" />
+    <Compile Include="DAL\IncomeExpenditure\IncomeExpenditureRegionRepository.cs" />
+    <Compile Include="DAL\IncomeExpenditure\IncomeExpenditureRepository.cs" />
+    <Compile Include="DAL\Inventory\InventoryAverageConsumptionRepository.cs" />
+    <Compile Include="DAL\Inventory\MaterialRepository.cs" />
+    <Compile Include="DAL\IncomeExpenditure\ProvinceIncomeExpenditureRepository.cs" />
+    <Compile Include="DAL\TrialBalance\RegionwiseTrialRepository.cs" />
+    <Compile Include="DAL\TrialBalance\TrialBalanceRepository.cs" />
+    <Compile Include="DAL\UserRoleRepository.cs" />
+    <Compile Include="DAL\Inventory\WarehouseRepository.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Models\AreaModel.cs" />
-    <Compile Include="Models\BillCycleModel.cs" />
-    <Compile Include="Models\DebtorDetailModel.cs" />
-    <Compile Include="Models\DebtorsBulkModel.cs" />
-    <Compile Include="Models\DebtorsModel.cs" />
-    <Compile Include="Models\CompanyTrialBalanceModel.cs" />
-    <Compile Include="Models\IncomeExpenditureModels.cs" />
-    <Compile Include="Models\IncomeExpenditureRegionModel.cs" />
-    <Compile Include="Models\InventoryAverageConsumptionModels.cs" />
-    <Compile Include="Models\Material.cs" />
-    <Compile Include="Models\MaterialProvinceStock.cs" />
-    <Compile Include="Models\MaterialReagionStock.cs" />
-    <Compile Include="Models\MaterialStockBalance.cs" />
-    <Compile Include="Models\ProvinceIncomeExpenditureModel.cs" />
-    <Compile Include="Models\RegionwiseTrialModel.cs" />
-    <Compile Include="Models\TrialBalanceModel.cs" />
+    <Compile Include="Models\Debtors\AreaModel.cs" />
+    <Compile Include="Models\Debtors\BillCycleModel.cs" />
+    <Compile Include="Models\Debtors\DebtorDetailModel.cs" />
+    <Compile Include="Models\Debtors\DebtorsBulkModel.cs" />
+    <Compile Include="Models\Debtors\DebtorsModel.cs" />
+    <Compile Include="Models\OUMModels.cs" />
+    <Compile Include="Models\TrialBalance\CompanyTrialBalanceModel.cs" />
+    <Compile Include="Models\IncomeExpenditure\IncomeExpenditureModels.cs" />
+    <Compile Include="Models\IncomeExpenditure\IncomeExpenditureRegionModel.cs" />
+    <Compile Include="Models\Inventory\InventoryAverageConsumptionModels.cs" />
+    <Compile Include="Models\Inventory\Material.cs" />
+    <Compile Include="Models\Inventory\MaterialProvinceStock.cs" />
+    <Compile Include="Models\Inventory\MaterialReagionStock.cs" />
+    <Compile Include="Models\Inventory\MaterialStockBalance.cs" />
+    <Compile Include="Models\IncomeExpenditure\ProvinceIncomeExpenditureModel.cs" />
+    <Compile Include="Models\TrialBalance\RegionwiseTrialModel.cs" />
+    <Compile Include="Models\TrialBalance\TrialBalanceModel.cs" />
+    <Compile Include="Models\UserRoleModel.cs" />
+    <Compile Include="Models\Inventory\WarehouseModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
